@@ -1,0 +1,56 @@
+# Poetry pyproject.toml: https://python-poetry.org/docs/pyproject/
+[build-system]
+requires = ["poetry_core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.poetry]
+name = "grote"
+version = "0.1.0"
+description = "Groningen Translation Environment"
+readme = "README.md"
+authors = ["Gabriele Sarti"]
+maintainers = ["Gabriele Sarti <gabriele.sarti996@gmail.com>"]
+license = "Apache 2.0"
+repository = "https://github.com/gsarti/grote"
+homepage = "https://github.com/gsarti/grote"
+
+# Keywords description https://python-poetry.org/docs/pyproject/#keywords
+keywords = ["translation environment", "gradio"]
+
+# Pypi classifiers: https://pypi.org/classifiers/
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: GPU",
+  "Environment :: GPU :: NVIDIA CUDA",
+  "Environment :: GPU :: NVIDIA CUDA :: 11.3",
+  "Intended Audience :: Science/Research",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+]
+
+[tool.poetry.scripts]
+# Entry points for the package https://python-poetry.org/docs/pyproject/#scripts
+"stylelm" = "grote.commands.cli:main"
+
+[tool.poetry.dependencies]
+python = ">=3.8,<3.11"
+
+gradio = "^3.1.4"
+
+[tool.poetry.dev-dependencies]
+bandit = "^1.7.4"
+black = "^22.3.0"
+darglint = "^1.8.1"
+flake8 = "^4.0.1"
+ipykernel = "^6.13.0"
+isort = {extras = ["colors"], version = "^5.10.1"}
+pre-commit = "^2.19.0"
+pydocstyle = "^6.1.1"
+pylint = "^2.14.1"
+pyupgrade = "^2.34.0"
+safety = "^1.10.3"
