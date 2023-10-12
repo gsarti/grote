@@ -7,6 +7,7 @@ from typing import Callable, Literal
 import gradio as gr
 
 from grote.collections.base import COMPONENT_CONFIGS, ComponentCollection, buildmethod
+from grote.functions import record_textbox_blur_fn, record_textbox_focus_fn, record_textbox_input_fn
 from grote.utils import CONFIG as cfg
 from grote.utils import tagged_text_to_tuples
 
@@ -22,15 +23,17 @@ class TranslateComponents(ComponentCollection):
     done_btn: gr.Button = None
     textboxes_col: gr.Column = None
 
-    def get_textboxes(self, count: int = -1):
-        return [c for c in self.textboxes_col.children if isinstance(c, gr.components.Component)][:count]
+    @property
+    def textboxes(self) -> list[gr.Textbox | gr.HighlightedTextbox]:
+        return [c for c in self.components if isinstance(c, (gr.Textbox, gr.HighlightedTextbox))]
 
-    def get_target_textboxes(self, count: int, target_pattern: str = r"target_\d+_txt"):
+    @property
+    def target_textboxes(self) -> list[gr.HighlightedTextbox]:
         return [
             c
-            for c in self.textboxes_col.children
-            if isinstance(c, gr.HighlightedTextbox) and re.match(target_pattern, c.elem_id)
-        ][:count]
+            for c in self.components
+            if isinstance(c, gr.HighlightedTextbox) and re.match(r"target_\d+_txt", c.elem_id)
+        ]
 
     @classmethod
     def get_reload_btn(cls, visible: bool = False) -> gr.Button:
@@ -96,3 +99,21 @@ class TranslateComponents(ComponentCollection):
         tc.done_btn = tc.get_done_btn()
         tc.textboxes_col = textboxes_col
         return tc
+
+    def set_editing_listeners(self, out_state: gr.State) -> None:
+        for textbox in self.target_textboxes:
+            textbox.focus(
+                record_textbox_focus_fn,
+                inputs=[out_state, textbox],
+                outputs=[out_state],
+            )
+            textbox.input(
+                record_textbox_input_fn,
+                inputs=[out_state, textbox],
+                outputs=[out_state],
+            )
+            textbox.blur(
+                record_textbox_blur_fn,
+                inputs=[out_state, textbox],
+                outputs=[out_state],
+            )
