@@ -8,14 +8,13 @@ help:
 	@echo "poetry-download : downloads and installs the poetry package manager"
 	@echo "poetry-remove   : removes the poetry package manager"
 	@echo "install         : installs required dependencies"
-	@echo "install-gpu    : installs required dependencies, plus Torch GPU support"
 	@echo "install-dev     : installs the dev dependencies for the project"
-	@echo "install-dev-gpu : installs the dev dependencies for the project, plus Torch GPU support"
 	@echo "update-deps     : updates the dependencies and writes them to requirements.txt"
 	@echo "check-style     : run checks on all files without fixing them."
 	@echo "fix-style       : run checks on files and potentially modifies them."
 	@echo "check-safety    : run safety checks on all tests."
 	@echo "lint            : run linting on all files (check-style + check-safety)"
+	@echo "test            : run all tests."
 	@echo "clean           : cleans all unecessary files."
 
 #* Poetry
@@ -29,53 +28,46 @@ poetry-remove:
 
 #* Installation
 
-.PHONY: add-torch-gpu
-add-torch-gpu:
-	poetry run poe upgrade-pip
-	poetry run poe torch-cuda10
-
 .PHONY: install
 install:
-	poetry install --no-dev
+	poetry install
 
 .PHONY: install-dev
 install-dev:
-	poetry install
+	poetry install --all-extras --with lint --sync
 	poetry run pre-commit install
 	poetry run pre-commit autoupdate
 
-.PHONY: install-gpu
-install-gpu: install add-torch-gpu
-
-.PHONY: install-dev-gpu
-install-dev-gpu: install-dev add-torch-gpu
-
 .PHONY: update-deps
 update-deps:
-	poetry update
-	poetry lock && poetry export --without-hashes > requirements.txt
+	poetry lock
+	poetry export --without-hashes > requirements.txt
+	poetry export --without-hashes -E notebook --with lint > requirements-dev.txt
 
 #* Linting
 .PHONY: check-style
 check-style:
-	poetry run isort --diff --check-only --settings-path pyproject.toml ./
 	poetry run black --diff --check --config pyproject.toml ./
-	poetry run flake8 --config setup.cfg ./
+	poetry run ruff  --no-fix --config pyproject.toml ./
 
 .PHONY: fix-style
 fix-style:
-	poetry run pyupgrade --exit-zero-even-if-changed --py38-plus **/*.py
-	poetry run isort --settings-path pyproject.toml ./
 	poetry run black --config pyproject.toml ./
+	poetry run ruff --config pyproject.toml ./
+
 
 .PHONY: check-safety
 check-safety:
 	poetry check
-	poetry run safety check --full-report
-	poetry run bandit -ll --recursive stylelm tests
+	poetry run safety check --full-report -i 53048
 
 .PHONY: lint
-lint: check-style check-safety
+lint: fix-style check-safety
+
+#* Linting
+.PHONY: test
+test:
+	poetry run pytest -c pyproject.toml -v
 
 #* Cleaning
 .PHONY: pycache-remove

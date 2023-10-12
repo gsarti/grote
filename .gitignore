@@ -8,6 +8,7 @@
 .AppleDouble
 .LSOverride
 .vscode
+.ruff_cache
 data/*
 !data/fixtures
 models/
