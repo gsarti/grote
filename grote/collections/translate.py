@@ -24,15 +24,15 @@ class TranslateComponents(ComponentCollection):
     textboxes_col: gr.Column = None
 
     @property
-    def textboxes(self) -> list[gr.Textbox | gr.HighlightedTextbox]:
-        return [c for c in self.components if isinstance(c, (gr.Textbox, gr.HighlightedTextbox))]
+    def textboxes(self) -> list[gr.Textbox | gr.HighlightedText]:
+        return [c for c in self.components if isinstance(c, (gr.Textbox, gr.HighlightedText))]
 
     @property
-    def target_textboxes(self) -> list[gr.HighlightedTextbox]:
+    def target_textboxes(self) -> list[gr.HighlightedText]:
         return [
             c
             for c in self.components
-            if isinstance(c, gr.HighlightedTextbox) and re.match(r"target_\d+_txt", c.elem_id)
+            if isinstance(c, gr.HighlightedText) and re.match(r"target_\d+_txt", c.elem_id)
         ]
 
     @classmethod
@@ -60,7 +60,7 @@ class TranslateComponents(ComponentCollection):
         visible: bool = False,
         lines: int = 2,
         show_legend: bool = False,
-    ) -> gr.components.Textbox | gr.components.HighlightedTextbox:
+    ) -> gr.components.Textbox | gr.components.HighlightedText:
         if type == "source":
             return gr.Textbox(
                 label=TRANS_CFG["source_textbox_label"],
@@ -70,7 +70,7 @@ class TranslateComponents(ComponentCollection):
                 visible=visible,
             )
         elif type == "target":
-            return gr.HighlightedTextbox(
+            return gr.HighlightedText(
                 value=tagged_text_to_tuples(value, tag_id=TRANS_CFG["highlight_label"]),
                 label=TRANS_CFG["target_textbox_label"],
                 elem_id=f"{type}_{id}_txt",
