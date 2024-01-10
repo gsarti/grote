@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Callable, Literal
 
 import gradio as gr
+from gradio_highlightedtextbox import HighlightedTextbox
 
 from grote.collections.base import COMPONENT_CONFIGS, ComponentCollection, buildmethod
 from grote.functions import record_textbox_blur_fn, record_textbox_focus_fn, record_textbox_input_fn
@@ -24,15 +25,13 @@ class TranslateComponents(ComponentCollection):
     textboxes_col: gr.Column = None
 
     @property
-    def textboxes(self) -> list[gr.Textbox | gr.HighlightedTextbox]:
-        return [c for c in self.components if isinstance(c, (gr.Textbox, gr.HighlightedTextbox))]
+    def textboxes(self) -> list[gr.Textbox | HighlightedTextbox]:
+        return [c for c in self.components if isinstance(c, (gr.Textbox, HighlightedTextbox))]
 
     @property
-    def target_textboxes(self) -> list[gr.HighlightedTextbox]:
+    def target_textboxes(self) -> list[HighlightedTextbox]:
         return [
-            c
-            for c in self.components
-            if isinstance(c, gr.HighlightedTextbox) and re.match(r"target_\d+_txt", c.elem_id)
+            c for c in self.components if isinstance(c, HighlightedTextbox) and re.match(r"target_\d+_txt", c.elem_id)
         ]
 
     @classmethod
@@ -70,7 +69,7 @@ class TranslateComponents(ComponentCollection):
                 visible=visible,
             )
         elif type == "target":
-            return gr.HighlightedTextbox(
+            return HighlightedTextbox(
                 value=tagged_text_to_tuples(value, tag_id=TRANS_CFG["highlight_label"]),
                 label=TRANS_CFG["target_textbox_label"],
                 elem_id=f"{type}_{id}_txt",

@@ -19,7 +19,7 @@ CONFIG = GroteConfig(**yaml.safe_load(open(Path(__file__).parent / "config.yaml"
 def tagged_text_to_tuples(
     text: str, tag_id: str, tag_open: str = "<h>", tag_close: str = "</h>"
 ) -> list[tuple[str, str | None]]:
-    """Parse a text containing tags into a list of tuples in the format accepted by gr.HighlightedTextbox.
+    """Parse a text containing tags into a list of tuples in the format accepted by HighlightedTextbox.
 
     E.g. Hello <h>world</h>! -> [("Hello", None), ("world", <TAG_ID>), ("!", None)]
 
@@ -37,7 +37,7 @@ def tagged_text_to_tuples(
         `ValueError`: Number of open tags does not match number of closed tags.
 
     Returns:
-        `list[tuple[str, str | None]]`: List of tuples in the format accepted by gr.HighlightedTextbox.
+        `list[tuple[str, str | None]]`: List of tuples in the format accepted by HighlightedTextbox.
     """
     # Check that the text is well-formed (i.e. no nested or empty tags)
     num_tags = text.count(tag_open)

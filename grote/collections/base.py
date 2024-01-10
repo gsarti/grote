@@ -38,9 +38,9 @@ class ComponentCollection:
         self._state = gr.State({c.elem_id: c.value for c in self.components})
 
     @classmethod
-    def _get_components(cls, item) -> list[gr.components.IOComponent]:
-        """Recursive method to extract all IOComponents from a given object"""
-        if isinstance(item, gr.components.IOComponent):
+    def _get_components(cls, item) -> list[gr.components.Component]:
+        """Recursive method to extract all Component from a given object"""
+        if isinstance(item, gr.components.Component):
             return [item]
         elif isinstance(item, ComponentCollection):
             return item.list_components()
@@ -54,7 +54,7 @@ class ComponentCollection:
             return []
 
     @property
-    def components(self) -> list[gr.components.IOComponent]:
+    def components(self) -> list[gr.components.Component]:
         all_components = []
         for f in self.__dataclass_fields__:
             component = getattr(self, f)
@@ -62,7 +62,7 @@ class ComponentCollection:
         return all_components
 
     @property
-    def editable_components(self) -> list[gr.components.IOComponent]:
+    def editable_components(self) -> list[gr.components.Component]:
         return [c for c in self.components if not isinstance(c, NON_EDITABLE_COMPONENTS)]
 
     @property
@@ -74,7 +74,7 @@ class ComponentCollection:
         self._state = state
 
     @classmethod
-    def make_component(cls, elem_id: str, **kwargs) -> gr.components.IOComponent:
+    def make_component(cls, elem_id: str, **kwargs) -> gr.components.Component:
         if not hasattr(cls, f"get_{elem_id}"):
             raise ValueError(f"Method get_{elem_id} not found for class {cls.__name__}.")
         return getattr(cls, f"get_{elem_id}")(**kwargs)
