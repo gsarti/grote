@@ -9,17 +9,17 @@ with gr.Blocks(theme=gr.themes.Default(primary_hue="red", secondary_hue="pink"))
         with gr.TabItem(cfg.translate_tab_label):
             lc = LoadComponents.build()
             tc = TranslateComponents.build()
-            out_state: gr.State = gr.State({})
+            out_state: gr.State = gr.State({"events": []})
 
     # Event Listeners
     lc.set_loading_listeners(tc, out_state)
     lc.clear_changes_listener(tc, out_state)
     tc.reload_btn.click(None, js="window.location.reload()")
-    # tc.set_editing_listeners(out_state)
+    tc.set_editing_listeners(out_state, lc.state)
 
 
 def main():
-    demo.queue().launch(debug=True)
+    demo.queue().launch()
 
 
 if __name__ == "__main__":

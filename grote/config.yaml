@@ -1,3 +1,3 @@
-max_num_sentences: 100
+max_num_sentences: 50
 login_codes: ["t1", "t2", "t3"]
 translate_tab_label: "🔠 Translate"

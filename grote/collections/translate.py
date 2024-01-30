@@ -10,7 +10,6 @@ from gradio_highlightedtextbox import HighlightedTextbox
 from grote.collections.base import COMPONENT_CONFIGS, ComponentCollection, buildmethod
 from grote.functions import record_textbox_blur_fn, record_textbox_focus_fn, record_textbox_input_fn
 from grote.utils import CONFIG as cfg
-from grote.utils import tagged_text_to_tuples
 
 TRANS_CFG = COMPONENT_CONFIGS["translate"]
 
@@ -59,7 +58,7 @@ class TranslateComponents(ComponentCollection):
         visible: bool = False,
         lines: int = 2,
         show_legend: bool = False,
-    ) -> gr.components.Textbox | gr.components.HighlightedTextbox:
+    ) -> gr.components.Textbox | HighlightedTextbox:
         if type == "source":
             return gr.Textbox(
                 label=TRANS_CFG["source_textbox_label"],
@@ -70,7 +69,7 @@ class TranslateComponents(ComponentCollection):
             )
         elif type == "target":
             return HighlightedTextbox(
-                value=tagged_text_to_tuples(value, tag_id=TRANS_CFG["highlight_label"]),
+                value=HighlightedTextbox.tagged_text_to_tuples(value, TRANS_CFG["highlight_label"]),
                 label=TRANS_CFG["target_textbox_label"],
                 elem_id=f"{type}_{id}_txt",
                 interactive=True,
@@ -99,20 +98,20 @@ class TranslateComponents(ComponentCollection):
         tc.textboxes_col = textboxes_col
         return tc
 
-    def set_editing_listeners(self, out_state: gr.State) -> None:
+    def set_editing_listeners(self, out_state: gr.State, lc_state: gr.State) -> None:
         for textbox in self.target_textboxes:
             textbox.focus(
                 record_textbox_focus_fn,
-                inputs=[out_state, textbox],
+                inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
             )
             textbox.input(
                 record_textbox_input_fn,
-                inputs=[out_state, textbox],
+                inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
             )
             textbox.blur(
                 record_textbox_blur_fn,
-                inputs=[out_state, textbox],
+                inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
             )
