@@ -2,14 +2,15 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
-from typing import Callable, Literal
+from typing import Any, Callable, Literal
 
 import gradio as gr
 from gradio_highlightedtextbox import HighlightedTextbox
 
 from grote.collections.base import COMPONENT_CONFIGS, ComponentCollection, buildmethod
+from grote.config import CONFIG as cfg
+from grote.event_logging import HuggingFaceDatasetEventSaver
 from grote.functions import record_textbox_blur_fn, record_textbox_focus_fn, record_textbox_input_fn
-from grote.utils import CONFIG as cfg
 
 TRANS_CFG = COMPONENT_CONFIGS["translate"]
 
@@ -19,7 +20,6 @@ class TranslateComponents(ComponentCollection):
     _id: str = "translate"
 
     reload_btn: gr.Button = None
-    clear_btn: gr.Button = None
     done_btn: gr.Button = None
     textboxes_col: gr.Column = None
 
@@ -36,10 +36,6 @@ class TranslateComponents(ComponentCollection):
     @classmethod
     def get_reload_btn(cls, visible: bool = False) -> gr.Button:
         return gr.Button(TRANS_CFG["reload_button_label"], variant="secondary", elem_id="reload_btn", visible=visible)
-
-    @classmethod
-    def get_clear_btn(cls, visible: bool = False) -> gr.Button:
-        return gr.Button(TRANS_CFG["clear_button_label"], variant="secondary", elem_id="clear_btn", visible=visible)
 
     @classmethod
     def get_done_btn(cls, visible: bool = False) -> gr.Button:
@@ -86,32 +82,62 @@ class TranslateComponents(ComponentCollection):
         target_sentences: list[str] = [""] * cfg.max_num_sentences,
     ) -> TranslateComponents:
         tc = TranslateComponents()
-        with gr.Row(equal_height=True):
-            tc.reload_btn = tc.get_reload_btn()
-            tc.clear_btn = tc.get_clear_btn()
         with tc.get_textboxes_col(visible=False) as textboxes_col:
             for idx, (src_sent, tgt_sent) in enumerate(zip(source_sentences, target_sentences)):
                 with gr.Row(equal_height=True, visible=False):
                     _ = tc.get_textbox_txt("source", idx, src_sent, lines=0)
                     _ = tc.get_textbox_txt("target", idx, tgt_sent, lines=0)
-        tc.done_btn = tc.get_done_btn()
+        with gr.Row(equal_height=True):
+            tc.reload_btn = tc.get_reload_btn()
+            tc.done_btn = tc.get_done_btn()
         tc.textboxes_col = textboxes_col
         return tc
 
-    def set_editing_listeners(self, out_state: gr.State, lc_state: gr.State) -> None:
+    def set_listeners(self, out_state: gr.State, lc_state: gr.State, writer: HuggingFaceDatasetEventSaver) -> None:
+        def save_logs_callback(state: dict[str, Any]) -> dict[str, Any]:
+            if len(state["events"]) > cfg.event_logs_save_frequency:
+                writer.save(state["events"])
+                state["events"] = []
+            return state
+
+        def save_logs_callback_no_check(state: dict[str, Any]) -> dict[str, Any]:
+            writer.save(state["events"])
+            state["events"] = []
+            return state
+
         for textbox in self.target_textboxes:
             textbox.focus(
                 record_textbox_focus_fn,
                 inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
+            ).then(
+                save_logs_callback,
+                inputs=[out_state],
+                outputs=[out_state],
             )
+
             textbox.input(
                 record_textbox_input_fn,
                 inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
+            ).then(
+                save_logs_callback,
+                inputs=[out_state],
+                outputs=[out_state],
             )
+
             textbox.blur(
                 record_textbox_blur_fn,
                 inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
+            ).then(
+                save_logs_callback,
+                inputs=[out_state],
+                outputs=[out_state],
             )
+
+            self.done_btn.click(
+                save_logs_callback_no_check,
+                inputs=[out_state],
+                outputs=[out_state],
+            ).then(None, js="window.location.reload()")

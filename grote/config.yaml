@@ -1,3 +1,8 @@
-max_num_sentences: 50
-login_codes: ["t1", "t2", "t3"]
+max_num_sentences: 300
+login_codes: ["gsarti", "vzouhar", "abisazza", "mnissim", "gchrupala"]
 translate_tab_label: "🔠 Translate"
+grote_logo_path: "assets/img/grote_logo.png"
+grote_icon_path: "assets/img/favicon.ico"
+event_logs_save_frequency: 50
+event_logs_hf_dataset_id: "grote/grote-logs"
+event_logs_local_dir: "logs"

@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "grote"
-version = "0.1.0"
+version = "0.1.1"
 description = "Groningen Translation Environment"
 readme = "README.md"
 authors = ["Gabriele Sarti"]
@@ -34,7 +34,7 @@ classifiers = [
 
 [tool.poetry.scripts]
 # Entry points for the package https://python-poetry.org/docs/pyproject/#scripts
-"grote" = "grote.demo:main"
+"grote" = "grote.app:main"
 
 
 [tool.poetry.dependencies]
@@ -42,6 +42,7 @@ python = ">=3.8,<3.12"
 
 gradio = "^4.16.0"
 gradio_highlightedtextbox = "^0.0.8"
+toml = "^0.10.2"
 
 ipykernel = { version = "^6.19.2", optional = true }
 ipywidgets = { version = "^8.0.0rc2", optional = true }

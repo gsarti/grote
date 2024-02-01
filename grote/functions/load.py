@@ -3,7 +3,7 @@ from typing import Any
 
 import gradio as gr
 
-from grote.utils import CONFIG as cfg
+from grote.config import CONFIG as cfg
 
 
 def check_inputs_fn(

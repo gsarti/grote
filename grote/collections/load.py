@@ -125,7 +125,7 @@ class LoadComponents(ComponentCollection):
         lc.start_btn = lc.get_start_btn()
         return lc
 
-    def set_loading_listeners(self, tc: TranslateComponents, out_state: gr.State) -> None:
+    def set_listeners(self, tc: TranslateComponents, out_state: gr.State) -> None:
         self.start_btn.click(
             check_inputs_fn,
             inputs=[
@@ -163,20 +163,6 @@ class LoadComponents(ComponentCollection):
             + [c for c in tc.textboxes_col.children if isinstance(c, gr.Row)],
         ).success(
             set_start_time_fn,
-            inputs=[out_state],
-            outputs=[out_state],
-        )
-
-    def clear_changes_listener(self, tc: TranslateComponents, out_state: gr.State) -> None:
-        tc.clear_btn.click(
-            initialize_translate_fn,
-            inputs=[self.state, tc.state],
-            outputs=[tc.textboxes_col]
-            + self.components
-            + tc.components
-            + [c for c in tc.textboxes_col.children if isinstance(c, gr.Row)],
-        ).success(
-            set_start_time_fn,
-            inputs=[out_state],
+            inputs=[out_state, self.state],
             outputs=[out_state],
         )
