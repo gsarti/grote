@@ -110,20 +110,14 @@ class TranslateComponents(ComponentCollection):
                 record_textbox_focus_fn,
                 inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
-            ).then(
-                save_logs_callback,
-                inputs=[out_state],
-                outputs=[out_state],
             )
 
             textbox.input(
                 record_textbox_input_fn,
                 inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
-            ).then(
-                save_logs_callback,
-                inputs=[out_state],
-                outputs=[out_state],
+                concurrency_limit=50,
+                trigger_mode="multiple",
             )
 
             textbox.blur(
@@ -131,13 +125,13 @@ class TranslateComponents(ComponentCollection):
                 inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
             ).then(
-                save_logs_callback,
+                save_logs_callback_no_check,
                 inputs=[out_state],
                 outputs=[out_state],
             )
 
             self.done_btn.click(
-                save_logs_callback_no_check,
+                save_logs_callback,
                 inputs=[out_state],
                 outputs=[out_state],
             ).then(None, js="window.location.reload()")

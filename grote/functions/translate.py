@@ -1,8 +1,6 @@
 from datetime import datetime
 from typing import Any
 
-from gradio_highlightedtextbox import HighlightedTextbox
-
 from grote.collections.base import COMPONENT_CONFIGS
 
 TRANS_CFG = COMPONENT_CONFIGS["translate"]
@@ -34,7 +32,9 @@ def record_textbox_focus_fn(state: dict[str, Any], textbox_content: dict, lc_sta
 
 
 def record_textbox_input_fn(state: dict[str, Any], textbox_content: dict, lc_state: dict[str, Any]) -> dict[str, Any]:
-    current_text = HighlightedTextbox.tuples_to_tagged_text(textbox_content["data"], TRANS_CFG["highlight_label"])
+    current_text = "".join(
+        f"<h>{text}</h>" if tag_id is not None else text for text, tag_id in textbox_content["data"]
+    )
     if textbox_content["id"] not in state or current_text != state[textbox_content["id"]]:
         out = {
             "time": get_current_time(),

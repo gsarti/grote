@@ -166,7 +166,7 @@ class HuggingFaceDatasetEventSaver(HuggingFaceDatasetSaver):
                 sanitized_value = [utils.sanitize_value_for_csv(v) if v is not None else v for v in value]
                 sanitized_values.append(sanitized_value)
             else:
-                sanitized_value = utils.sanitize_value_for_csv(value) if value is not None else v
+                sanitized_value = utils.sanitize_value_for_csv(value) if value is not None else value
                 sanitized_values.append(sanitized_value)
         return sanitized_values
 
