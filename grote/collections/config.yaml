@@ -13,6 +13,8 @@ load:
     target_sentences_placeholder: "Insert one translated sentence per line..."
     start_button_label: "📝 Start"
 translate:
+    source_side_label: "<h3>Source sentences</h3>"
+    target_side_label: "<h3>Translations with&nbsp;<span style='background-color: #fee2e2; color: black;'>potential issues</span></h3><p>Use the green checkmark to remove remaining highlights after editing.</p>"
     reload_button_label: "⬅️ Back to data loading"
     clear_button_label: "🗑️ Clear current changes"
     done_button_label: "✅ Done"

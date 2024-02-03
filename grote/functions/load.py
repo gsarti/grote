@@ -101,7 +101,7 @@ def parse_inputs_fn(
     return login_code_txt, empty_src_file, empty_tgt_file, src_sentences_txt, tgt_sentences_txt, state
 
 
-def initialize_translate_fn(lc_state: dict[str, Any], tc_state: dict[str, Any]):
+def initialize_translate_interface_fn(lc_state: dict[str, Any], tc_state: dict[str, Any]):
     """Initializes the translation tab."""
     from grote.collections import LoadComponents, TranslateComponents
 
@@ -123,11 +123,7 @@ def initialize_translate_fn(lc_state: dict[str, Any], tc_state: dict[str, Any]):
                 curr_sent = source_sentences[int(txt_id)]
             elif txt_type == "target":
                 curr_sent = target_sentences[int(txt_id)]
-            tc_components.append(
-                TranslateComponents.get_textbox_txt(
-                    txt_type, txt_id, curr_sent, visible=True, show_legend=int(txt_id) == 0
-                )
-            )
+            tc_components.append(TranslateComponents.get_textbox_txt(txt_type, txt_id, curr_sent, visible=True))
             tc_state[f"{txt_type}_{txt_id}_txt"] = curr_sent
         else:
             tc_components.append(TranslateComponents.get_textbox_txt(txt_type, txt_id, "", visible=False))

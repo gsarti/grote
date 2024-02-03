@@ -9,8 +9,14 @@ from gradio_highlightedtextbox import HighlightedTextbox
 
 from grote.collections.base import COMPONENT_CONFIGS, ComponentCollection, buildmethod
 from grote.config import CONFIG as cfg
-from grote.event_logging import HuggingFaceDatasetEventSaver
-from grote.functions import record_textbox_blur_fn, record_textbox_focus_fn, record_textbox_input_fn
+from grote.event_logging import EventLogger
+from grote.functions import (
+    record_textbox_blur_fn,
+    record_textbox_focus_fn,
+    record_textbox_input_fn,
+    record_textbox_remove_highlights_fn,
+    record_trial_end_fn,
+)
 
 TRANS_CFG = COMPONENT_CONFIGS["translate"]
 
@@ -19,6 +25,8 @@ TRANS_CFG = COMPONENT_CONFIGS["translate"]
 class TranslateComponents(ComponentCollection):
     _id: str = "translate"
 
+    source_side_label: gr.Markdown = None
+    target_side_label: gr.Markdown = None
     reload_btn: gr.Button = None
     done_btn: gr.Button = None
     textboxes_col: gr.Column = None
@@ -32,6 +40,18 @@ class TranslateComponents(ComponentCollection):
         return [
             c for c in self.components if isinstance(c, HighlightedTextbox) and re.match(r"target_\d+_txt", c.elem_id)
         ]
+
+    @classmethod
+    def get_source_side_label_cap(cls, value: str | None = None, visible: bool = False) -> gr.Markdown:
+        if not value:
+            value = TRANS_CFG["source_side_label"]
+        return gr.Markdown(value, visible=visible, elem_id="source_side_label_cap")
+
+    @classmethod
+    def get_target_side_label_cap(cls, value: str | None = None, visible: bool = False) -> gr.Markdown:
+        if not value:
+            value = TRANS_CFG["target_side_label"]
+        return gr.Markdown(value, visible=visible, elem_id="target_side_label_cap")
 
     @classmethod
     def get_reload_btn(cls, visible: bool = False) -> gr.Button:
@@ -53,7 +73,6 @@ class TranslateComponents(ComponentCollection):
         value: str | Callable = "",
         visible: bool = False,
         lines: int = 2,
-        show_legend: bool = False,
     ) -> gr.components.Textbox | HighlightedTextbox:
         if type == "source":
             return gr.Textbox(
@@ -62,6 +81,8 @@ class TranslateComponents(ComponentCollection):
                 elem_id=f"{type}_{id}_txt",
                 value=value,
                 visible=visible,
+                elem_classes=["source-textbox"],
+                show_label=False,
             )
         elif type == "target":
             return HighlightedTextbox(
@@ -69,9 +90,11 @@ class TranslateComponents(ComponentCollection):
                 label=TRANS_CFG["target_textbox_label"],
                 elem_id=f"{type}_{id}_txt",
                 interactive=True,
-                show_legend=show_legend,
+                show_label=False,
+                show_legend=False,
                 combine_adjacent=True,
                 visible=visible,
+                show_remove_tags_button=True,
             )
 
     @classmethod
@@ -82,6 +105,9 @@ class TranslateComponents(ComponentCollection):
         target_sentences: list[str] = [""] * cfg.max_num_sentences,
     ) -> TranslateComponents:
         tc = TranslateComponents()
+        with gr.Row(equal_height=True):
+            tc.source_side_label = tc.get_source_side_label_cap()
+            tc.target_side_label = tc.get_target_side_label_cap()
         with tc.get_textboxes_col(visible=False) as textboxes_col:
             for idx, (src_sent, tgt_sent) in enumerate(zip(source_sentences, target_sentences)):
                 with gr.Row(equal_height=True, visible=False):
@@ -93,15 +119,15 @@ class TranslateComponents(ComponentCollection):
         tc.textboxes_col = textboxes_col
         return tc
 
-    def set_listeners(self, out_state: gr.State, lc_state: gr.State, writer: HuggingFaceDatasetEventSaver) -> None:
+    def set_listeners(self, out_state: gr.State, lc_state: gr.State, logger: EventLogger) -> None:
         def save_logs_callback(state: dict[str, Any]) -> dict[str, Any]:
             if len(state["events"]) > cfg.event_logs_save_frequency:
-                writer.save(state["events"])
+                logger.save(state["events"])
                 state["events"] = []
             return state
 
         def save_logs_callback_no_check(state: dict[str, Any]) -> dict[str, Any]:
-            writer.save(state["events"])
+            logger.save(state["events"])
             state["events"] = []
             return state
 
@@ -125,13 +151,28 @@ class TranslateComponents(ComponentCollection):
                 inputs=[out_state, textbox, lc_state],
                 outputs=[out_state],
             ).then(
-                save_logs_callback_no_check,
+                save_logs_callback,
                 inputs=[out_state],
                 outputs=[out_state],
             )
 
-            self.done_btn.click(
+            textbox.clear(
+                record_textbox_remove_highlights_fn,
+                inputs=[out_state, textbox, lc_state],
+                outputs=[out_state],
+                trigger_mode="multiple",
+            ).then(
                 save_logs_callback,
                 inputs=[out_state],
                 outputs=[out_state],
-            ).then(None, js="window.location.reload()")
+            )
+
+        self.done_btn.click(
+            record_trial_end_fn,
+            inputs=[out_state, lc_state],
+            outputs=[out_state],
+        ).then(
+            save_logs_callback_no_check,
+            inputs=[out_state],
+            outputs=[out_state],
+        ).then(None, js="window.location.reload()")

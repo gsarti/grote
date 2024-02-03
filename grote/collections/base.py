@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from dataclasses import dataclass
 from functools import wraps
 from pathlib import Path
@@ -82,4 +83,8 @@ class ComponentCollection:
     @classmethod
     @buildmethod
     def build(cls: T, **kwargs) -> T:
+        raise NotImplementedError
+
+    @abstractmethod
+    def set_listeners(self, *args, **kwargs) -> None:
         raise NotImplementedError

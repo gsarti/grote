@@ -4,6 +4,8 @@ from pathlib import Path
 
 import toml
 
+from .app import make_demo
+
 
 def get_version() -> str | None:
     pyproject_toml_file = Path(__file__).parent.parent / "pyproject.toml"
@@ -13,3 +15,5 @@ def get_version() -> str | None:
 
 
 __version__ = get_version()
+
+__all__ = ["make_demo"]

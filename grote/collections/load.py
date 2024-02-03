@@ -7,7 +7,7 @@ import gradio as gr
 
 from grote.collections.base import COMPONENT_CONFIGS, ComponentCollection, buildmethod
 from grote.collections.translate import TranslateComponents
-from grote.functions import check_inputs_fn, initialize_translate_fn, parse_inputs_fn, set_start_time_fn
+from grote.functions import check_inputs_fn, initialize_translate_interface_fn, parse_inputs_fn, record_trial_start_fn
 
 LOAD_CFG = COMPONENT_CONFIGS["load"]
 
@@ -155,14 +155,14 @@ class LoadComponents(ComponentCollection):
                 self.state,
             ],
         ).success(
-            initialize_translate_fn,
+            initialize_translate_interface_fn,
             inputs=[self.state, tc.state],
             outputs=[tc.textboxes_col]
             + self.components
             + tc.components
             + [c for c in tc.textboxes_col.children if isinstance(c, gr.Row)],
         ).success(
-            set_start_time_fn,
+            record_trial_start_fn,
             inputs=[out_state, self.state],
             outputs=[out_state],
         )
