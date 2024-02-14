@@ -3,7 +3,7 @@ import gradio as gr
 from grote.collections import LoadComponents, TranslateComponents
 from grote.config import CONFIG as cfg
 from grote.event_logging import EventLogger
-from grote.style import custom_css
+from grote.style import custom_css, ensure_dark_theme_js
 
 event_logger = EventLogger(
     cfg.hf_token, cfg.event_logs_hf_dataset_id, private=True, logging_dir=cfg.event_logs_local_dir
@@ -11,7 +11,9 @@ event_logger = EventLogger(
 
 
 def make_demo():
-    with gr.Blocks(theme=gr.themes.Default(primary_hue="red", secondary_hue="pink"), css=custom_css) as demo:
+    with gr.Blocks(
+        theme=gr.themes.Default(primary_hue="red", secondary_hue="pink"), css=custom_css, js=ensure_dark_theme_js
+    ) as demo:
         lc = LoadComponents.build()
         tc = TranslateComponents.build()
         out_state: gr.State = gr.State({"events": []})

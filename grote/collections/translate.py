@@ -27,6 +27,7 @@ class TranslateComponents(ComponentCollection):
 
     source_side_label: gr.Markdown = None
     target_side_label: gr.Markdown = None
+    target_side_legend: gr.Markdown = None
     reload_btn: gr.Button = None
     done_btn: gr.Button = None
     textboxes_col: gr.Column = None
@@ -52,6 +53,15 @@ class TranslateComponents(ComponentCollection):
         if not value:
             value = TRANS_CFG["target_side_label"]
         return gr.Markdown(value, visible=visible, elem_id="target_side_label_cap")
+
+    @classmethod
+    def get_target_side_legend_cap(cls, value: str | None = None, visible: bool = False) -> gr.Markdown:
+        if not value and TRANS_CFG["highlight_labels"] and TRANS_CFG["highlight_colors"]:
+            value = "<b>Legend:</b>" + "".join(
+                f'<span style="background-color:{color}; margin-left: 0.5em; color: black; padding: 0px 5px;">{label}</span>'
+                for label, color in zip(TRANS_CFG["highlight_labels"], TRANS_CFG["highlight_colors"])
+            )
+        return gr.Markdown(value, visible=visible, elem_id="target_side_legend_cap")
 
     @classmethod
     def get_reload_btn(cls, visible: bool = False) -> gr.Button:
@@ -85,8 +95,19 @@ class TranslateComponents(ComponentCollection):
                 show_label=False,
             )
         elif type == "target":
+            tuples = HighlightedTextbox.tagged_text_to_tuples(
+                value,
+                tag_ids=TRANS_CFG["highlight_labels"],
+                tags_open=[f"<{tag}>" for tag in cfg.allowed_tags],
+                tags_close=[f"</{tag}>" for tag in cfg.allowed_tags],
+            )
+            color_map = None
+            if TRANS_CFG["highlight_colors"]:
+                if len(TRANS_CFG["highlight_colors"]) != len(TRANS_CFG["highlight_labels"]):
+                    raise ValueError("highlight_colors and highlight_labels must have the same length")
+                color_map = dict(zip(TRANS_CFG["highlight_labels"], TRANS_CFG["highlight_colors"]))
             return HighlightedTextbox(
-                value=HighlightedTextbox.tagged_text_to_tuples(value, TRANS_CFG["highlight_label"]),
+                value=tuples,
                 label=TRANS_CFG["target_textbox_label"],
                 elem_id=f"{type}_{id}_txt",
                 interactive=True,
@@ -95,6 +116,7 @@ class TranslateComponents(ComponentCollection):
                 combine_adjacent=True,
                 visible=visible,
                 show_remove_tags_button=True,
+                color_map=color_map,
             )
 
     @classmethod
@@ -107,7 +129,9 @@ class TranslateComponents(ComponentCollection):
         tc = TranslateComponents()
         with gr.Row(equal_height=True):
             tc.source_side_label = tc.get_source_side_label_cap()
-            tc.target_side_label = tc.get_target_side_label_cap()
+            with gr.Column(visible=True):
+                tc.target_side_label = tc.get_target_side_label_cap()
+                tc.target_side_legend = tc.get_target_side_legend_cap()
         with tc.get_textboxes_col(visible=False) as textboxes_col:
             for idx, (src_sent, tgt_sent) in enumerate(zip(source_sentences, target_sentences)):
                 with gr.Row(equal_height=True, visible=False):

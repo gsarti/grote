@@ -29,7 +29,8 @@ class GroteConfig:
     hf_token: str | None
         The Hugging Face token to use to create (and write the logged sample to) the Hugging Face dataset
         (defaults to the registered one).
-
+    allowed_tags: list[str]
+        The list of allowed tags to be used in the translation tab.
     """
 
     max_num_sentences: int = 100
@@ -38,6 +39,7 @@ class GroteConfig:
     event_logs_hf_dataset_id: str = "grote-logs"
     event_logs_local_dir: str = "logs"
     hf_token: str | None = None
+    allowed_tags: list[str] = field(default_factory=["minor", "major", "critical"])
 
 
 CONFIG = GroteConfig(

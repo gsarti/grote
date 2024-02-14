@@ -7,3 +7,14 @@ custom_css = """
     resize: none;
 }
 """
+
+ensure_dark_theme_js = """
+function refresh() {
+    const url = new URL(window.location);
+
+    if (url.searchParams.get('__theme') !== 'dark') {
+        url.searchParams.set('__theme', 'dark');
+        window.location.href = url.href;
+    }
+}
+"""

@@ -7,7 +7,7 @@ import gradio as gr
 
 from grote.collections.base import COMPONENT_CONFIGS, ComponentCollection, buildmethod
 from grote.collections.translate import TranslateComponents
-from grote.functions import check_inputs_fn, initialize_translate_interface_fn, parse_inputs_fn, record_trial_start_fn
+from grote.functions import check_and_parse_inputs_fn, initialize_translate_interface_fn, record_trial_start_fn
 
 LOAD_CFG = COMPONENT_CONFIGS["load"]
 
@@ -18,12 +18,9 @@ class LoadComponents(ComponentCollection):
 
     login_code_description_cap: gr.Markdown = None
     login_code_txt: gr.Textbox = None
-    source_input_description_cap: gr.Markdown = None
-    source_file_in: gr.File = None
-    source_sentences_txt: gr.Textbox = None
-    target_input_description_cap: gr.Markdown = None
-    target_file_in: gr.File = None
-    target_sentences_txt: gr.Textbox = None
+    input_description_cap: gr.Markdown = None
+    file_in: gr.File = None
+    sentences_txt: gr.Textbox = None
     start_btn: gr.Button = None
 
     @classmethod
@@ -45,17 +42,17 @@ class LoadComponents(ComponentCollection):
         )
 
     @classmethod
-    def get_source_input_description_cap(cls, value: str | None = None, visible: bool = True) -> gr.Markdown:
+    def get_input_description_cap(cls, value: str | None = None, visible: bool = True) -> gr.Markdown:
         if not value:
-            value = LOAD_CFG["source_input_description"]
-        return gr.Markdown(value, visible=visible, elem_id="source_input_description_cap")
+            value = LOAD_CFG["input_description"]
+        return gr.Markdown(value, visible=visible, elem_id="input_description_cap")
 
     @classmethod
-    def get_source_file_in(cls, value: str | list[str] | Callable | None = None, visible: bool = True) -> gr.File:
+    def get_file_in(cls, value: str | list[str] | Callable | None = None, visible: bool = True) -> gr.File:
         return gr.File(
-            label=LOAD_CFG["source_file_label"],
+            label=LOAD_CFG["file_label"],
             interactive=True,
-            elem_id="source_file_in",
+            elem_id="file_in",
             height=200,
             file_count="single",
             file_types=["txt"],
@@ -64,42 +61,12 @@ class LoadComponents(ComponentCollection):
         )
 
     @classmethod
-    def get_source_sentences_txt(cls, value: str | Callable = "", visible: bool = True) -> gr.components.Textbox:
+    def get_sentences_txt(cls, value: str | Callable = "", visible: bool = True) -> gr.components.Textbox:
         return gr.Textbox(
-            label=LOAD_CFG["source_sentences_label"],
+            label=LOAD_CFG["sentences_label"],
             lines=6,
-            elem_id="source_sentences_txt",
-            placeholder=LOAD_CFG["source_sentences_placeholder"],
-            value=value,
-            visible=visible,
-        )
-
-    @classmethod
-    def get_target_input_description_cap(cls, value: str | None = None, visible: bool = True) -> gr.Markdown:
-        if not value:
-            value = LOAD_CFG["target_input_description"]
-        return gr.Markdown(value, visible=visible, elem_id="target_input_description_cap")
-
-    @classmethod
-    def get_target_file_in(cls, value: str | list[str] | Callable | None = None, visible: bool = True) -> gr.File:
-        return gr.File(
-            label=LOAD_CFG["target_file_label"],
-            interactive=True,
-            elem_id="target_file_in",
-            height=200,
-            file_count="single",
-            file_types=["txt"],
-            value=value,
-            visible=visible,
-        )
-
-    @classmethod
-    def get_target_sentences_txt(cls, value: str | Callable = "", visible: bool = True) -> gr.Textbox:
-        return gr.Textbox(
-            label=LOAD_CFG["target_sentences_label"],
-            lines=6,
-            elem_id="target_sentences_txt",
-            placeholder=LOAD_CFG["target_sentences_placeholder"],
+            elem_id="sentences_txt",
+            placeholder=LOAD_CFG["sentences_placeholder"],
             value=value,
             visible=visible,
         )
@@ -114,44 +81,23 @@ class LoadComponents(ComponentCollection):
         lc: LoadComponents = cls()
         lc.login_code_description_cap = lc.get_login_code_description_cap()
         lc.login_code_txt = lc.get_login_code_txt()
-        lc.source_input_description_cap = lc.get_source_input_description_cap()
+        lc.input_description_cap = lc.get_input_description_cap()
         with gr.Row(equal_height=True):
-            lc.source_file_in = lc.get_source_file_in()
-            lc.source_sentences_txt = lc.get_source_sentences_txt()
-        lc.target_input_description_cap = lc.get_target_input_description_cap()
-        with gr.Row(equal_height=True):
-            lc.target_file_in = lc.get_target_file_in()
-            lc.target_sentences_txt = lc.get_target_sentences_txt()
+            lc.file_in = lc.get_file_in()
+            lc.sentences_txt = lc.get_sentences_txt()
         lc.start_btn = lc.get_start_btn()
         return lc
 
     def set_listeners(self, tc: TranslateComponents, out_state: gr.State) -> None:
         self.start_btn.click(
-            check_inputs_fn,
+            check_and_parse_inputs_fn,
             inputs=[
                 self.login_code_txt,
-                self.source_file_in,
-                self.target_file_in,
-                self.source_sentences_txt,
-                self.target_sentences_txt,
-            ],
-            outputs=[],
-        ).success(
-            parse_inputs_fn,
-            inputs=[
-                self.login_code_txt,
-                self.source_file_in,
-                self.target_file_in,
-                self.source_sentences_txt,
-                self.target_sentences_txt,
+                self.file_in,
+                self.sentences_txt,
                 self.state,
             ],
             outputs=[
-                self.login_code_txt,
-                self.source_file_in,
-                self.target_file_in,
-                self.source_sentences_txt,
-                self.target_sentences_txt,
                 self.state,
             ],
         ).success(
