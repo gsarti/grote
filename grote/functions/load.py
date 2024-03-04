@@ -43,7 +43,9 @@ def check_and_parse_inputs_fn(
     if file_in is not None:
         with open(file_in.name) as f:
             sentences_txt = f.read()
-    sentences_txt = sentences_txt.split("\n")
+            # remove empty lines
+            sentences_txt = re.sub(r"\n+", "\n", sentences_txt)
+    sentences_txt = sentences_txt.strip().split("\n")
 
     if not all(" ||| " in s for s in sentences_txt):
         raise gr.Error("ERROR: Sentences must match the format SOURCE ||| TARGET")
