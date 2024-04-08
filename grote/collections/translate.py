@@ -57,7 +57,7 @@ class TranslateComponents(ComponentCollection):
     @classmethod
     def get_target_side_legend_cap(cls, value: str | None = None, visible: bool = False) -> gr.Markdown:
         if not value and TRANS_CFG["highlight_labels"] and TRANS_CFG["highlight_colors"]:
-            value = "<b>Legend:</b>" + "".join(
+            value = f"<b>{TRANS_CFG['legend_label']}:</b>" + "".join(
                 f'<span style="background-color:{color}; margin-left: 0.5em; color: black; padding: 0px 5px;">{label}</span>'
                 for label, color in zip(TRANS_CFG["highlight_labels"], TRANS_CFG["highlight_colors"])
             )

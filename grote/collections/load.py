@@ -53,7 +53,6 @@ class LoadComponents(ComponentCollection):
             label=LOAD_CFG["file_label"],
             interactive=True,
             elem_id="file_in",
-            height=200,
             file_count="single",
             file_types=["txt"],
             value=value,

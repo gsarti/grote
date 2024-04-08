@@ -9,16 +9,16 @@ load:
     sentences_placeholder: "Insert one sentence with format SOURCE ||| TARGET per line..."
     start_button_label: "📝 Start"
 translate:
-    source_side_label: "<h3>Source sentences</h3>"
+    source_side_label: "<h3>Source sentences</h3><p>These are the original sentences you need to translate.</p>"
     target_side_label: "<h3>Translations with&nbsp;<span style='background-color: #fee2e2; color: black;'>potential issues</span></h3><p>Use the green checkmark to remove remaining highlights after editing.</p>"
     reload_button_label: "⬅️ Back to data loading"
-    clear_button_label: "🗑️ Clear current changes"
     done_button_label: "✅ Done"
     source_textbox_label: "Source text"
     target_textbox_label: "Translation"
+    legend_label: "Potential issue severity"
     highlight_labels:
-        - "Minor Error"
-        - "Major Error"
+        - "Minor"
+        - "Major"
     highlight_colors:
-        - "#ccfbf1"
         - "#ffedd5"
+        - "#fcd29a"
