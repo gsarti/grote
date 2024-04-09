@@ -25,24 +25,23 @@ def make_demo():
         tc.reload_btn.click(None, js="window.location.reload()")
         lc.set_listeners(tc, out_state)
         tc.set_listeners(out_state, lc.state, event_logger)
-        with gr.Row(elem_classes="footer-container"):
-            with gr.Row(elem_classes="footer-custom-block"):
-                with gr.Column(scale=0.31, min_width=200):
-                    gr.Markdown(
-                        """<b>Built by <a href="https://gsarti.com" target="_blank">Gabriele Sarti</a> with the support of</b>"""
-                    )
-                with gr.Column(scale=0.23, min_width=120):
-                    gr.Markdown(
-                        """<a href='https://www.rug.nl/research/clcg/research/cl/' target='_blank'><img src="file/assets/img/rug_logo_white_contour.png" width=170px /></a>"""
-                    )
-                with gr.Column(scale=0.23, min_width=120):
-                    gr.Markdown(
-                        """<a href='https://projects.illc.uva.nl/indeep/' target='_blank'><img src="file/assets/img/indeep_logo_white_contour.png" width=100px /></a>"""
-                    )
-                with gr.Column(scale=0.23, min_width=120):
-                    gr.Markdown(
-                        """<a href='https://imminent.translated.com/' target='_blank'><img src="file/assets/img/imminent_logo_white_contour.png" width=150px /></a>"""
-                    )
+        # with gr.Row(elem_classes="footer-custom-block"):
+        #        with gr.Column():
+        #            gr.Markdown(
+        #                """<b>Built by <a href="https://gsarti.com" target="_blank">Gabriele Sarti</a> with the support of</b>"""
+        #            )
+        #        with gr.Column():
+        #            gr.Markdown(
+        #                """<a href='https://www.rug.nl/research/clcg/research/cl/' target='_blank'><img src="file/assets/img/rug_logo_white_contour.png" width=170px /></a>"""
+        #            )
+        #        with gr.Column():
+        #            gr.Markdown(
+        #                """<a href='https://projects.illc.uva.nl/indeep/' target='_blank'><img src="file/assets/img/indeep_logo_white_contour.png" width=100px /></a>"""
+        #            )
+        #        with gr.Column():
+        #            gr.Markdown(
+        #                """<a href='https://imminent.translated.com/' target='_blank'><img src="file/assets/img/imminent_logo_white_contour.png" width=150px /></a>"""
+        #            )
 
     return demo
 
@@ -53,7 +52,8 @@ demo = make_demo()
 def main():
     current_file_path = Path(__file__).resolve()
     img_path = (current_file_path.parent / ".." / "assets" / "img").resolve()
-    demo.queue(api_open=False).launch(show_api=False, allowed_paths=[img_path])
+    gr.set_static_paths(paths=[img_path])
+    demo.queue(api_open=False).launch(show_api=False, allowed_paths=[img_path], favicon_path=img_path / "favicon.ico")
 
 
 if __name__ == "__main__":

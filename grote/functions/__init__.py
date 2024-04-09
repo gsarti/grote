@@ -6,6 +6,7 @@ from .translate import (
     record_textbox_remove_highlights_fn,
     record_trial_end_fn,
     record_trial_start_fn,
+    save_outputs_to_file,
 )
 
 __all__ = [
@@ -17,4 +18,5 @@ __all__ = [
     "record_textbox_remove_highlights_fn",
     "record_trial_start_fn",
     "record_trial_end_fn",
+    "save_outputs_to_file",
 ]

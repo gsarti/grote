@@ -6,11 +6,8 @@ custom_css = """
     border-width: 0px;
     resize: none;
 }
-.footer-container {
-    margin-top: 20px;
-    align-items: center;
-}
 .footer-custom-block {
+    margin-top: 20px;
     display: flex;
     justify-content: center;
     align-items: center;

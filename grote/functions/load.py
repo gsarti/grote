@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 from typing import Any
 
 import gradio as gr
@@ -73,6 +74,7 @@ def check_and_parse_inputs_fn(
                     )
     state["login_code_txt"] = login_code_txt
     state["file_in"] = None
+    state["_filename"] = Path(file_in.name).stem if file_in is not None else "grote_sentences.txt"
     state["sentences_txt"] = sentences_txt
     return state
 

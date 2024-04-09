@@ -60,7 +60,7 @@ class LoadComponents(ComponentCollection):
         )
 
     @classmethod
-    def get_sentences_txt(cls, value: str | Callable = "", visible: bool = True) -> gr.components.Textbox:
+    def get_sentences_txt(cls, value: str | Callable = "", visible: bool = False) -> gr.components.Textbox:
         return gr.Textbox(
             label=LOAD_CFG["sentences_label"],
             lines=6,
@@ -81,9 +81,8 @@ class LoadComponents(ComponentCollection):
         lc.login_code_description_cap = lc.get_login_code_description_cap()
         lc.login_code_txt = lc.get_login_code_txt()
         lc.input_description_cap = lc.get_input_description_cap()
-        with gr.Row(equal_height=True):
-            lc.file_in = lc.get_file_in()
-            lc.sentences_txt = lc.get_sentences_txt()
+        lc.file_in = lc.get_file_in()
+        lc.sentences_txt = lc.get_sentences_txt()
         lc.start_btn = lc.get_start_btn()
         return lc
 

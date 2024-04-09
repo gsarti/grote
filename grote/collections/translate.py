@@ -16,6 +16,7 @@ from grote.functions import (
     record_textbox_input_fn,
     record_textbox_remove_highlights_fn,
     record_trial_end_fn,
+    save_outputs_to_file,
 )
 
 TRANS_CFG = COMPONENT_CONFIGS["translate"]
@@ -30,6 +31,7 @@ class TranslateComponents(ComponentCollection):
     target_side_legend: gr.Markdown = None
     reload_btn: gr.Button = None
     done_btn: gr.Button = None
+    download_btn: gr.DownloadButton = None
     textboxes_col: gr.Column = None
 
     @property
@@ -70,6 +72,16 @@ class TranslateComponents(ComponentCollection):
     @classmethod
     def get_done_btn(cls, visible: bool = False) -> gr.Button:
         return gr.Button(TRANS_CFG["done_button_label"], variant="primary", elem_id="done_btn", visible=visible)
+
+    @classmethod
+    def get_download_btn(cls, visible: bool = False) -> gr.DownloadButton:
+        return gr.DownloadButton(
+            TRANS_CFG["download_button_label"],
+            variant="primary",
+            elem_id="download_btn",
+            visible=visible,
+            interactive=False,
+        )
 
     @classmethod
     def get_textboxes_col(cls, visible: bool = False) -> gr.Column:
@@ -140,6 +152,7 @@ class TranslateComponents(ComponentCollection):
         with gr.Row(equal_height=True):
             tc.reload_btn = tc.get_reload_btn()
             tc.done_btn = tc.get_done_btn()
+        tc.download_btn = tc.get_download_btn()
         tc.textboxes_col = textboxes_col
         return tc
 
@@ -199,4 +212,8 @@ class TranslateComponents(ComponentCollection):
             save_logs_callback_no_check,
             inputs=[out_state],
             outputs=[out_state],
-        ).then(None, js="window.location.reload()")
+        ).then(
+            save_outputs_to_file,
+            inputs=[lc_state] + self.target_textboxes,
+            outputs=[self.download_btn, self.done_btn],
+        )
