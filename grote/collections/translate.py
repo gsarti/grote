@@ -58,10 +58,10 @@ class TranslateComponents(ComponentCollection):
 
     @classmethod
     def get_target_side_legend_cap(cls, value: str | None = None, visible: bool = False) -> gr.Markdown:
-        if not value and TRANS_CFG["highlight_labels"] and TRANS_CFG["highlight_colors"]:
+        if not value and cfg.tag_labels and cfg.tag_colors:
             value = f"<b>{TRANS_CFG['legend_label']}:</b>" + "".join(
                 f'<span style="background-color:{color}; margin-left: 0.5em; color: black; padding: 0px 5px;">{label}</span>'
-                for label, color in zip(TRANS_CFG["highlight_labels"], TRANS_CFG["highlight_colors"])
+                for label, color in zip(cfg.tag_labels, cfg.tag_colors)
             )
         return gr.Markdown(value, visible=visible, elem_id="target_side_legend_cap")
 
@@ -109,15 +109,15 @@ class TranslateComponents(ComponentCollection):
         elif type == "target":
             tuples = HighlightedTextbox.tagged_text_to_tuples(
                 value,
-                tag_ids=TRANS_CFG["highlight_labels"],
+                tag_ids=cfg.tag_labels,
                 tags_open=[f"<{tag}>" for tag in cfg.allowed_tags],
                 tags_close=[f"</{tag}>" for tag in cfg.allowed_tags],
             )
             color_map = None
-            if TRANS_CFG["highlight_colors"]:
-                if len(TRANS_CFG["highlight_colors"]) != len(TRANS_CFG["highlight_labels"]):
+            if cfg.tag_colors:
+                if len(cfg.tag_colors) != len(cfg.tag_labels):
                     raise ValueError("highlight_colors and highlight_labels must have the same length")
-                color_map = dict(zip(TRANS_CFG["highlight_labels"], TRANS_CFG["highlight_colors"]))
+                color_map = dict(zip(cfg.tag_labels, cfg.tag_colors))
             return HighlightedTextbox(
                 value=tuples,
                 label=TRANS_CFG["target_textbox_label"],

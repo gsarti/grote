@@ -17,9 +17,3 @@ translate:
     source_textbox_label: "Source text"
     target_textbox_label: "Translation"
     legend_label: "Potential issue severity"
-    highlight_labels:
-        - "Minor"
-        - "Major"
-    highlight_colors:
-        - "#ffedd5"
-        - "#fcd29a"

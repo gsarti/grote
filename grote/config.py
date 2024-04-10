@@ -34,14 +34,29 @@ class GroteConfig:
     """
 
     max_num_sentences: int = 100
-    login_codes: list[str] = field(default_factory=["admin"])
+    login_codes: str | list[str] = "admin"
     event_logs_save_frequency: int = 50
     event_logs_hf_dataset_id: str = "grote-logs"
     event_logs_local_dir: str = "logs"
     hf_token: str | None = None
-    allowed_tags: list[str] = field(default_factory=["minor", "major", "critical"])
+    allowed_tags: str | list[str] = field(default_factory=["minor", "major"])
+    tag_labels: str | list[str] = field(default_factory=["Minor", "Major"])
+    tag_colors: str | list[str] = field(default_factory=["#ffedd5", "#fcd29a"])
+
+    @staticmethod
+    def init_list(val: str | list) -> list:
+        if isinstance(val, str):
+            return val.split(",")
+        return val
+
+    def __post_init__(self):
+        self.login_codes = self.init_list(self.login_codes)
+        self.allowed_tags = self.init_list(self.allowed_tags)
+        self.tag_labels = self.init_list(self.tag_labels)
+        self.tag_colors = self.init_list(self.tag_colors)
 
 
+# Priority: environment variables > config.yaml
 CONFIG = GroteConfig(
     **yaml.safe_load(open(Path(__file__).parent / "config.yaml", encoding="utf8")),
     **{k.lower(): v for k, v in os.environ.items() if k.lower() in [f.name.lower() for f in fields(GroteConfig)]},
