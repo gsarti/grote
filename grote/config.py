@@ -58,6 +58,8 @@ class GroteConfig:
 
 # Priority: environment variables > config.yaml
 CONFIG = GroteConfig(
-    **yaml.safe_load(open(Path(__file__).parent / "config.yaml", encoding="utf8")),
-    **{k.lower(): v for k, v in os.environ.items() if k.lower() in [f.name.lower() for f in fields(GroteConfig)]},
+    **{
+        **yaml.safe_load(open(Path(__file__).parent / "config.yaml", encoding="utf8")),
+        **{k.lower(): v for k, v in os.environ.items() if k.lower() in [f.name.lower() for f in fields(GroteConfig)]},
+    }
 )
