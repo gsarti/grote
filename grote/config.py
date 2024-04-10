@@ -49,7 +49,15 @@ class GroteConfig:
             return val.split(",")
         return val
 
+    @staticmethod
+    def parse_int(val: str | int) -> int:
+        if isinstance(val, str):
+            return int(val)
+        return val
+
     def __post_init__(self):
+        self.max_num_sentences = self.parse_int(self.max_num_sentences)
+        self.event_logs_save_frequency = self.parse_int(self.event_logs_save_frequency)
         self.login_codes = self.init_list(self.login_codes)
         self.allowed_tags = self.init_list(self.allowed_tags)
         self.tag_labels = self.init_list(self.tag_labels)
