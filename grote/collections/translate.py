@@ -51,18 +51,24 @@ class TranslateComponents(ComponentCollection):
         return gr.Markdown(value, visible=visible, elem_id="source_side_label_cap")
 
     @classmethod
-    def get_target_side_label_cap(cls, value: str | None = None, visible: bool = False) -> gr.Markdown:
+    def get_target_side_label_cap(
+        cls, value: str | None = None, visible: bool = False, has_highlights: bool = True
+    ) -> gr.Markdown:
         if not value:
-            value = TRANS_CFG["target_side_label"]
+            value = TRANS_CFG["target_side_label"] if has_highlights else TRANS_CFG["target_side_label_no_highlights"]
         return gr.Markdown(value, visible=visible, elem_id="target_side_label_cap")
 
     @classmethod
-    def get_target_side_legend_cap(cls, value: str | None = None, visible: bool = False) -> gr.Markdown:
-        if not value and cfg.tag_labels and cfg.tag_colors:
+    def get_target_side_legend_cap(
+        cls, value: str | None = None, visible: bool = False, has_highlights: bool = True
+    ) -> gr.Markdown:
+        if not value and cfg.tag_labels and cfg.tag_colors and has_highlights:
             value = f"<b>{TRANS_CFG['legend_label']}:</b>" + "".join(
                 f'<span style="background-color:{color}; margin-left: 0.5em; color: black; padding: 0px 5px;">{label}</span>'
                 for label, color in zip(cfg.tag_labels, cfg.tag_colors)
             )
+        elif not value and not has_highlights:
+            value = TRANS_CFG["legend_label_no_highlights"]
         return gr.Markdown(value, visible=visible, elem_id="target_side_legend_cap")
 
     @classmethod
@@ -95,6 +101,7 @@ class TranslateComponents(ComponentCollection):
         value: str | Callable = "",
         visible: bool = False,
         lines: int = 2,
+        has_highlights: bool = True,
     ) -> gr.components.Textbox | HighlightedTextbox:
         if type == "source":
             return gr.Textbox(
@@ -127,7 +134,7 @@ class TranslateComponents(ComponentCollection):
                 show_legend=False,
                 combine_adjacent=True,
                 visible=visible,
-                show_remove_tags_button=True,
+                show_remove_tags_button=has_highlights,
                 color_map=color_map,
             )
 

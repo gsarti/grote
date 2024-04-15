@@ -1,3 +1,4 @@
+import inspect
 from abc import abstractmethod
 from dataclasses import dataclass
 from functools import wraps
@@ -78,7 +79,10 @@ class ComponentCollection:
     def make_component(cls, elem_id: str, **kwargs) -> gr.components.Component:
         if not hasattr(cls, f"get_{elem_id}"):
             raise ValueError(f"Method get_{elem_id} not found for class {cls.__name__}.")
-        return getattr(cls, f"get_{elem_id}")(**kwargs)
+        builder_fn = getattr(cls, f"get_{elem_id}")
+        # Filter kwargs to only pass those that are accepted by the builder function
+        kwargs = {k: v for k, v in kwargs.items() if k in inspect.signature(builder_fn).parameters}
+        return builder_fn(**kwargs)
 
     @classmethod
     @buildmethod

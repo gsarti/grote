@@ -54,10 +54,13 @@ def check_and_parse_inputs_fn(
     source_sentences = [sent.split(" ||| ")[0] for sent in sentences_txt]
     target_sentences = [sent.split(" ||| ")[1] for sent in sentences_txt]
     # Check wellformedness of source and target sentences (highlights allowed in target sentences only)
-    find_tag_pattern = rf"(<\/?[{'|'.join(cfg.allowed_tags)}]>)"
+    find_tag_pattern = rf"(<\/?(?:{'|'.join(cfg.allowed_tags)})>)"
+    open_tags = [f"<{tag}>" for tag in cfg.allowed_tags]
+    close_tags = [f"</{tag}>" for tag in cfg.allowed_tags]
     source_matches = [(m.group(0),) + m.span() for m in re.finditer(find_tag_pattern, "\n".join(source_sentences))]
     if len(source_matches) > 0:
         raise gr.Error("ERROR: Source sentences cannot contain highlights.")
+    state["_has_highlights"] = False
     for tgt_sent_idx, target_sentence in enumerate(target_sentences, start=1):
         target_matches = [(m.group(0),) + m.span() for m in re.finditer(find_tag_pattern, target_sentence)]
         num_matches = len(target_matches)
@@ -65,13 +68,14 @@ def check_and_parse_inputs_fn(
             if num_matches % 2 != 0:
                 raise gr.Error(f"ERROR: Target sentence {tgt_sent_idx} contains an unclosed highlight.")
             for curr_match_idx, match in enumerate(target_matches, start=1):
-                if (curr_match_idx % 2 != 0 and not match[0].startswith("</")) or (
-                    curr_match_idx % 2 == 0 and match[0].startswith("</")
+                if (curr_match_idx % 2 != 0 and match[0] not in open_tags) or (
+                    curr_match_idx % 2 == 0 and match[0] not in close_tags
                 ):
                     raise gr.Error(
                         f"ERROR: Target sentence {tgt_sent_idx} contains an invalid highlight ({curr_match_idx},"
                         f" {match[0]})."
                     )
+            state["_has_highlights"] = True
     state["login_code_txt"] = login_code_txt
     state["file_in"] = None
     state["_filename"] = Path(file_in.name).stem if file_in is not None else "grote_sentences.txt"
@@ -94,7 +98,11 @@ def initialize_translate_interface_fn(lc_state: dict[str, Any], tc_state: dict[s
     tc_components = []
     for tc_elem_id in tc_state.keys():
         if not tc_elem_id.startswith("_") and not tc_elem_id.endswith("_txt"):
-            tc_components.append(TranslateComponents.make_component(tc_elem_id, visible=True))
+            tc_components.append(
+                TranslateComponents.make_component(
+                    tc_elem_id, visible=True, has_highlights=lc_state["_has_highlights"]
+                )
+            )
     for tc_elem_id in [k for k in tc_state.keys() if k.endswith("_txt")]:
         txt_type, txt_id, _ = tc_elem_id.split("_")
         if int(txt_id) < len(source_sentences):
@@ -102,10 +110,18 @@ def initialize_translate_interface_fn(lc_state: dict[str, Any], tc_state: dict[s
                 curr_sent = source_sentences[int(txt_id)]
             elif txt_type == "target":
                 curr_sent = target_sentences[int(txt_id)]
-            tc_components.append(TranslateComponents.get_textbox_txt(txt_type, txt_id, curr_sent, visible=True))
+            tc_components.append(
+                TranslateComponents.get_textbox_txt(
+                    txt_type, txt_id, curr_sent, visible=True, has_highlights=lc_state["_has_highlights"]
+                )
+            )
             tc_state[f"{txt_type}_{txt_id}_txt"] = curr_sent
         else:
-            tc_components.append(TranslateComponents.get_textbox_txt(txt_type, txt_id, "", visible=False))
+            tc_components.append(
+                TranslateComponents.get_textbox_txt(
+                    txt_type, txt_id, "", visible=False, has_highlights=lc_state["_has_highlights"]
+                )
+            )
     n_hid = cfg.max_num_sentences - num_sentences
     return (
         [TranslateComponents.get_textboxes_col(visible=True)]

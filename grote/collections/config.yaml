@@ -10,10 +10,12 @@ load:
     start_button_label: "📝 Start"
 translate:
     source_side_label: "<h3>Source sentences</h3><p>These are the original sentences you need to translate.</p>"
-    target_side_label: "<h3>Translations with&nbsp;<span style='background-color: #fee2e2; color: black;'>potential issues</span></h3><p>Use the green checkmark to remove remaining highlights after editing.</p>"
+    target_side_label: "<h3>Translations with potential issues</h3><p>These are pre-translated sentences that may require editing. Use the green checkmark to remove remaining highlights if needed.</p>"
+    target_side_label_no_highlights: "<h3>Translations with potential issues</h3>"
     reload_button_label: "⬅️ Back to data loading"
     done_button_label: "✅ Done"
     download_button_label: "📥 Download translations"
     source_textbox_label: "Source text"
     target_textbox_label: "Translation"
     legend_label: "Potential issue severity"
+    legend_label_no_highlights: "These are pre-translated sentences that may require editing."
