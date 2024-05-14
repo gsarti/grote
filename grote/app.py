@@ -11,11 +11,19 @@ event_logger = EventLogger(
     cfg.hf_token, cfg.event_logs_hf_dataset_id, private=True, logging_dir=cfg.event_logs_local_dir
 )
 
+# launch default browser dialog when the window is refreshed/closed
+prevent_data_loss_js = """
+function prevent_reload() {
+    window.onbeforeunload = () => true;
+}
+"""
 
 def make_demo():
     with gr.Blocks(
         theme=gr.themes.Default(primary_hue="red", secondary_hue="pink"),
-        css=custom_css,  # js=ensure_dark_theme_js
+        css=custom_css,
+        js=prevent_data_loss_js,
+        # js=ensure_dark_theme_js
     ) as demo:
         gr.HTML('<img src="file/assets/img/grote_logo.png" width=200px />')
         lc = LoadComponents.build()
