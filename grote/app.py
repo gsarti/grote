@@ -5,18 +5,12 @@ import gradio as gr
 from grote.collections import LoadComponents, TranslateComponents
 from grote.config import CONFIG as cfg
 from grote.event_logging import EventLogger
-from grote.style import custom_css
+from grote.style import custom_css, prevent_data_loss_js
 
 event_logger = EventLogger(
     cfg.hf_token, cfg.event_logs_hf_dataset_id, private=True, logging_dir=cfg.event_logs_local_dir
 )
 
-# launch default browser dialog when the window is refreshed/closed
-prevent_data_loss_js = """
-function prevent_reload() {
-    window.onbeforeunload = () => true;
-}
-"""
 
 def make_demo():
     with gr.Blocks(

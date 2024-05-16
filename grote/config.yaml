@@ -3,6 +3,7 @@ login_codes: ["gsarti", "vzouhar", "abisazza", "mnissim", "gchrupala"]
 event_logs_save_frequency: 50
 event_logs_hf_dataset_id: "grote/grote-logs"
 event_logs_local_dir: "logs"
+allow_copy_source: true
 allowed_tags:
 - "minor"
 - "major"

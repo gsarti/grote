@@ -26,6 +26,8 @@ class GroteConfig:
         The Hugging Face dataset ID to save the event logs to.
     event_logs_local_dir: str
         The local directory where the event logs are saved.
+    allow_copy_source: bool
+        Whether to allow the user to copy the source text to the clipboard.
     hf_token: str | None
         The Hugging Face token to use to create (and write the logged sample to) the Hugging Face dataset
         (defaults to the registered one).
@@ -38,6 +40,7 @@ class GroteConfig:
     event_logs_save_frequency: int = 50
     event_logs_hf_dataset_id: str = "grote-logs"
     event_logs_local_dir: str = "logs"
+    allow_copy_source: bool = True
     hf_token: str | None = None
     allowed_tags: str | list[str] = field(default_factory=["minor", "major"])
     tag_labels: str | list[str] = field(default_factory=["Minor", "Major"])

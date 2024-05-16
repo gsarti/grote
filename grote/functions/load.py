@@ -88,8 +88,8 @@ def initialize_translate_interface_fn(lc_state: dict[str, Any], tc_state: dict[s
     from grote.collections import LoadComponents, TranslateComponents
 
     sentences = lc_state["sentences_txt"]
-    source_sentences = [sent.split(" ||| ")[0] for sent in sentences]
-    target_sentences = [sent.split(" ||| ")[1] for sent in sentences]
+    source_sentences = [sent.split(" ||| ")[0].strip() for sent in sentences]
+    target_sentences = [sent.split(" ||| ")[1].strip() for sent in sentences]
     num_sentences = len(sentences)
     lc_components = []
     for lc_elem_id in lc_state.keys():

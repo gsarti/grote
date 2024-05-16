@@ -1,8 +1,12 @@
 custom_css = """
-.source-textbox textarea{
+.textbox-prevent-copy textarea{
     user-select: none;
     cursor: not-allowed;
     pointer-events: none;
+    border-width: 0px;
+    resize: none;
+}
+.source-text textarea {
     border-width: 0px;
     resize: none;
 }
@@ -28,5 +32,12 @@ function refresh() {
         url.searchParams.set('__theme', 'dark');
         window.location.href = url.href;
     }
+}
+"""
+
+# launch default browser dialog when the window is refreshed/closed
+prevent_data_loss_js = """
+function prevent_reload() {
+    window.onbeforeunload = () => true;
 }
 """

@@ -5,7 +5,7 @@ build-backend = "poetry.core.masonry.api"
 
 [tool.poetry]
 name = "grote"
-version = "0.1.9"
+version = "0.1.10"
 description = "Groningen Translation Environment"
 readme = "README.md"
 authors = ["Gabriele Sarti"]
@@ -40,7 +40,7 @@ classifiers = [
 [tool.poetry.dependencies]
 python = ">=3.8,<3.12"
 
-gradio = "^4.26.0"
+gradio = "^4.29.0"
 gradio_highlightedtextbox = "^0.0.12"
 toml = "^0.10.2"
 

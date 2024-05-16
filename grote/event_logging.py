@@ -57,7 +57,7 @@ class EventLogger(HuggingFaceDatasetSaver):
         Params:
             flagging_dir (str): local directory where the dataset is cloned, updated, and pushed from.
         """
-        feature_names = ["time", "login_code", "text_id", "event_type", "text"]
+        feature_names = ["time", "login_code", "text_id", "filename", "event_type", "text"]
         features = {name: {"dtype": "string", "_type": "Value"} for name in feature_names}
         self.features = features
         path_glob = "**/*.jsonl" if self.separate_dirs else "data.csv"
@@ -234,3 +234,20 @@ class EventLogger(HuggingFaceDatasetSaver):
                 save_dic[header] = [row[i] for row in rows]
             json.dump(save_dic, f)
         return data_file.parent.name
+
+    def sort_filter_duplicates(self) -> int:
+        """Sort the dataset and remove duplicates."""
+        data_dir = self.dataset_dir
+        data_file = data_dir / "data.csv"
+        with filelock.FileLock(data_dir / ".lock"):
+            with data_file.open("r", newline="", encoding="utf-8") as csvfile:
+                reader = csv.reader(csvfile)
+                header = next(reader)
+                rows = list(reader)
+            rows.sort()  # Sort by time
+            rows = [rows[0]] + [row for i, row in enumerate(rows[1:], 1) if row != rows[i - 1]]
+            with data_file.open("w", newline="", encoding="utf-8") as csvfile:
+                writer = csv.writer(csvfile)
+                writer.writerow(header)
+                writer.writerows(rows)
+        return len(rows) - 1

@@ -110,7 +110,7 @@ class TranslateComponents(ComponentCollection):
                 elem_id=f"{type}_{id}_txt",
                 value=value,
                 visible=visible,
-                elem_classes=["source-textbox"],
+                elem_classes=["textbox-prevent-copy", "source-text"] if not cfg.allow_copy_source else ["source-text"],
                 show_label=False,
             )
         elif type == "target":
@@ -219,6 +219,9 @@ class TranslateComponents(ComponentCollection):
             save_logs_callback_no_check,
             inputs=[out_state],
             outputs=[out_state],
+        ).then(
+            lambda: logger.sort_filter_duplicates(),
+            inputs=None,
         ).then(
             save_outputs_to_file,
             inputs=[lc_state] + self.target_textboxes,
