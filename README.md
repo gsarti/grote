@@ -20,6 +20,71 @@ An online GroTE demo is available at [https://grote-app.hf.space](https://grote-
 2. In Settings > Variables and secrets, change the default value of `EVENT_LOGS_HF_DATASET_ID`, `HF_TOKEN` and `LOGIN_CODES` to your desired values (see [GroTE config](grote/config.yaml) for more details).
 3. Upon running the app and starting the editing, you should see the logs being written to the dataset having the id is specified in `EVENT_LOGS_HF_DATASET_ID`.
 
+Use or modify the following code to create multiple copies of the app programmatically:
+
+```python
+from huggingface_hub import duplicate_space, SpaceHardware
+
+NUM_TRANSLATORS = 5
+USER_OR_ORG = "<your_username_or_organization>"
+YOUR_HF_TOKEN = "hf_<your_token>"
+
+names = [f"translator-{idx}" for idx in range(1, NUM_TRANSLATORS + 1)]
+
+for name in names:
+    duplicate_space(
+        from_id="grote/app",
+        to_id=f"{USER_OR_ORG}/grote-{name}",
+        private=False,
+        token=YOUR_HF_TOKEN,
+        hardware=SpaceHardware.CPU_BASIC,
+        secrets=[
+            {
+                "key": "HF_TOKEN",
+                "value": YOUR_HF_TOKEN,
+                "description": " Hugging Face token for logging purposes",
+            },
+            {
+                "key": "LOGIN_CODES",
+                "value": f"{name.lower()},admin",
+                "description": "List of login codes for the users",
+            },
+        ],
+        variables=[
+            {
+                "key": "MAX_NUM_SENTENCES",
+                "value": "50",
+            },
+            {
+                "key": "EVENT_LOGS_SAVE_FREQUENCY",
+                "value": "50",
+            },
+            {
+                "key": "EVENT_LOGS_HF_DATASET_ID",
+                "value": f"{USER_OR_ORG}/grote-{name}",
+            },
+            {
+                "key": "EVENT_LOGS_LOCAL_DIR",
+                "value": "logs",
+            },
+            {
+                "key": "ALLOWED_TAGS",
+                "value": "minor,major",
+            },
+            {
+                "key": "TAG_LABLES",
+                "value": "Minor,Major",
+            },
+            {
+                "key": "TAG_COLORS",
+                "value": "#ffedd5,#fcd29a",
+            }
+        ]
+    )
+for name in names:
+    print(f"URL: https://{USER_OR_ORG}-grote-{name}.hf.space\nLogin code: {name.lower()}")
+```
+
 ## Editing flow with GroTE
 
 1. Open the webpage of the GroTE interface
