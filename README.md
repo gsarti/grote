@@ -23,7 +23,7 @@ An online GroTE demo is available at [https://grote-app.hf.space](https://grote-
 5. Perform the editing. If needed, use green checkmarks to remove highlights from a segment.
 6. When all segments for the file are finished, click “✅ Done”
 7. A message “Saving trial information. Don't close the tab until the download button is available!” will appear. Do not close the tab.
-8. When the message “Saving complete! Download the output file by clicking the 'Download translations' button below.” appears, click “📥 Download translations” to download the edited files. The file will have the name “<LOGIN CODE>_<FILENAME>_output.txt”
+8. When the message “Saving complete! Download the output file by clicking the 'Download translations' button below.” appears, click “📥 Download translations” to download the edited files. The file will have the name `<LOGIN CODE>_<FILENAME>_output.txt`
 9. Click “⬅️ Back to data loading” to return to the file loading page.
 10. If needed, pause and take a break
 
