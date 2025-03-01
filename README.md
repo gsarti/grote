@@ -2,7 +2,7 @@
 
 ## Demo example
 
-An online GroTE demo is available at [https://grote-app.hf.space](https://grote-app.hf.space). The demo will log events to the private repository [grote/grote-logs](https://huggingface.co/datasets/grote/grote-logs).
+An online GroTE demo is available at [https://grote-app.hf.space](https://grote-app.hf.space). You can use `admin` as a login code, and upload one of the files in [assets/examples](assets/examples/en_it.txt) for the editing. The demo will log events to the repository [grote/grote-logs](https://huggingface.co/datasets/grote/grote-logs).
 
 ## Running GroTE locally
 
@@ -13,6 +13,12 @@ An online GroTE demo is available at [https://grote-app.hf.space](https://grote-
 5. Visit http://127.0.0.1:7860 to access the demo.
 6. Enter your login code and load an example document from [assets/examples](assets/examples/en_it.txt).
 7. Press "📝 Start" to begin editing the document.
+
+## Setting up a new GroTE instance on HF Spaces
+
+1. Use the "Duplicate this space" option from the [original GroTE demo](https://huggingface.co/spaces/grote/app) to create a copy in your user/organization profile.
+2. In Settings > Variables and secrets, change the default value of `EVENT_LOGS_HF_DATASET_ID`, `HF_TOKEN` and `LOGIN_CODES` to your desired values (see [GroTE config](grote/config.yaml) for more details).
+3. Upon running the app and starting the editing, you should see the logs being written to the dataset having the id is specified in `EVENT_LOGS_HF_DATASET_ID`.
 
 ## Editing flow with GroTE
 
